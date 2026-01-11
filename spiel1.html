@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1–10</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #2a2f8f, #0f122f);
+  color: #fff;
+  padding-top: 60px;
+}
+
+/* ================= CONTENT ================= */
+.content-box {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 30px;
+  border-radius: 22px;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(14px);
+  border: 2px solid rgba(255,255,255,0.25);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.45);
+}
+
+.content-header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.content-header h1 {
+  font-size: 2.4rem;
+  letter-spacing: 2px;
+}
+
+/* ================= DIFFICULTY ================= */
+.difficulty-box {
+  padding: 20px;
+  border-radius: 18px;
+  background: rgba(0,0,0,0.35);
+  border: 2px solid rgba(255,255,255,0.25);
+  text-align: center;
+}
+
+.result {
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease;
+}
+
+.result.show {
+  opacity: 1;
+  transform: translateY(0);
+  font-size: 1.1rem;
+}
+
+.roller {
+  position: relative;
+  height: 70px;
+  overflow: hidden;
+  margin: 20px 0;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.2);
+}
+
+.roller-list {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  transition: transform 2s cubic-bezier(.15,.85,.25,1);
+}
+
+.roller-item {
+  height: 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.chillig { color: #6dffb8; }
+.mid { color: #ffd66d; }
+.cooked { color: #ff6d6d; }
+
+.roll-btn {
+  margin-top: 15px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6d7cff, #9c6dff);
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.roll-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(60%);
+}
+
+/* ================= HAMBURGER & SIDEBAR ================= */
+.hamburger {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 32px;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+.hamburger span {
+  display: block;
+  height: 4px;
+  background: white;
+  margin: 6px 0;
+  border-radius: 4px;
+}
+
+.side-menu {
+  position: fixed;
+  top: 0;
+  right: -280px;
+  width: 260px;
+  height: 100vh;
+  background: rgba(0,0,0,0.9);
+  padding: 30px 20px;
+  transition: right 0.4s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.side-menu.active { right: 0; }
+
+.side-menu button {
+  padding: 12px;
+  border-radius: 10px;
+  background: #ffffff22;
+  border: none;
+  color: white;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.back-bar {
+  margin-top: auto;
+  padding: 14px;
+  text-align: center;
+  background: #ffffff22;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+/* Ergebnis-Glow */
+.chillig {
+  color: #4dffb2;
+  text-shadow: 0 0 12px #4dffb2, 0 0 24px #4dffb2;
+}
+
+.mid {
+  color: #ffb84d;
+  text-shadow: 0 0 12px #ffb84d, 0 0 24px #ffb84d;
+}
+
+.cooked {
+  color: #ff5c5c;
+  text-shadow: 0 0 12px #ff5c5c, 0 0 24px #ff5c5c;
+}
+
+/* Box leer nach Roll */
+.roller-box.empty {
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* Hint-Box */
+.hint-box {
+  margin-top: 20px;
+  padding: 14px 20px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(6px);
+  color: rgba(255,255,255,0.75);
+  font-size: 1.2rem;
+  letter-spacing: 0.5px;
+  opacity: 0;
+  transform: translateY(6px);
+  text-align: center;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.hint-box.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.roll-btn {
+  margin-top: 15px;
+  padding: 14px 22px;
+  border: 2px solid rgba(255,255,255,0.25);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.35);
+}
+
+.roll-btn:hover {
+  background: rgba(255,255,255,0.18);
+}
+
+.roll-btn:active {
+  transform: scale(0.97);
+}
+
+.roll-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(60%);
+  background: rgba(255,255,255,0.08);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+}
+
+    .hamburger {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 30px;
+      cursor: pointer;
+      z-index: 1001;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+
+.hint-box.pulse {
+  animation: hintPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes hintPulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 0.85; }
+  100% { opacity: 0.5; }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="hamburger" onclick="toggleMenu()">
+  <span></span><span></span><span></span>
+</div>
+
+<div id="sideMenu" class="side-menu">
+  <h2>⚙ Optionen</h2>
+  <button onclick="location.href='../index.html'">⬅ Zurück zum Startmenü</button>
+  <div class="back-bar" onclick="toggleMenu()">Menü schließen</div>
+</div>
+
+<div class="content-box">
+  <div class="content-header">
+    <h1>1–10</h1>
+  </div>
+
+  <div class="difficulty-box">
+    <div id="result" class="result"></div>
+
+    <div class="roller">
+      <div class="roller-list" id="rollerList">
+        <div class="roller-item chillig">Chillig</div>
+        <div class="roller-item mid">Mid</div>
+        <div class="roller-item cooked">Cooked</div>
+        <div class="roller-item chillig">Chillig</div>
+        <div class="roller-item mid">Mid</div>
+        <div class="roller-item cooked">Cooked</div>
+      </div>
+    </div>
+
+    <div class="roller-box" id="rollerBox"></div>
+
+    <!-- HIER KOMMT DER TEXT Z.B. "Viel Glück" -->
+    <div class="hint-box" id="hintBox">???</div>
+
+    <button class="roll-btn" onclick="roll()">Rollen</button>
+  </div>
+</div>
+
+<script>
+const difficulties = ["chillig", "mid", "cooked"];
+
+function toggleMenu() {
+    const menu = document.getElementById("sideMenu");
+    const hamburger = document.querySelector(".hamburger");
+    
+    menu.classList.toggle("active");
+
+    // Striche sanft ein- und ausblenden
+    if (menu.classList.contains("active")) {
+        hamburger.style.opacity = "0";
+    } else {
+        hamburger.style.opacity = "1";
+    }
+}
+
+
+
+
+const texts = {
+  chillig: ["Entspann dich.", "Easy Mode.", "Kein Stress."],
+  mid: ["Nicht ganz easy.", "Konzentration!", "Jetzt wird’s spannend."],
+  cooked: ["Du bist cooked.", "Viel Glück.", "Das wird hart."]
+};
+
+let isRolling = false;
+let currentIndex = 0;
+const itemHeight = 70;
+
+const list = document.getElementById("rollerList");
+
+// Endlos-Loop für den Roller
+const baseItems = [...list.children];
+for (let i = 0; i < 50; i++) { // Liste stark verlängern → fühlt sich endlos an
+  baseItems.forEach(item => list.appendChild(item.cloneNode(true)));
+}
+
+function roll() {
+    if (isRolling) return;
+    isRolling = true;
+
+    const result = document.getElementById("result");
+    const hintBox = document.getElementById("hintBox");
+    const button = document.querySelector(".roll-btn");
+
+    button.disabled = true;
+    result.classList.remove("show");
+
+    const extraSpins = Math.floor(Math.random() * 10) + 15; // Zufallsanzahl an Spins
+// Gewichtete Wahrscheinlichkeit
+const rand = Math.random() * 100;
+let randomOffset;
+
+if (rand < 49.5) {
+  randomOffset = 0; // chillig
+} else if (rand < 82.5) {
+  randomOffset = 1; // mid
+} else {
+  randomOffset = 2; // cooked
+}
+
+
+    // Neuen Index berechnen
+    currentIndex += extraSpins * difficulties.length + randomOffset;
+
+    // Animation starten
+    list.style.transition = "transform 4.5s cubic-bezier(0.05, 0.9, 0.15, 1)";
+    list.style.transform = `translateY(-${currentIndex * itemHeight}px)`;
+
+    setTimeout(() => {
+        // Nach der Animation: reset der Position, damit der Roller nicht „stoppt“
+        const displayIndex = currentIndex % difficulties.length;
+        list.style.transition = "none";
+        currentIndex = displayIndex;
+        list.style.transform = `translateY(-${currentIndex * itemHeight}px)`;
+
+        document.getElementById("rollerBox").classList.add("empty");
+
+        const choice = difficulties[displayIndex];
+
+        result.innerHTML = `Schwierigkeit: <span class="${choice}">${choice.toUpperCase()}</span>`;
+        result.classList.add("show");
+
+        // Text in Hint-Box
+        hintBox.textContent = texts[choice][Math.floor(Math.random() * texts[choice].length)];
+        hintBox.classList.add("show");
+
+        button.disabled = false;
+        isRolling = false;
+    }, 4600);
+    function toggleMenu() {
+    const menu = document.getElementById("sideMenu");
+    menu.classList.toggle("active");
+}
+
+}
+</script>
+
+
+</body>
+</html>
